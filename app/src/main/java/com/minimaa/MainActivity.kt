@@ -51,8 +51,8 @@ fun Root() {
     var screen by remember { mutableStateOf("home") }
     var loopInitialTab by remember { mutableIntStateOf(0) }
     var loopOpenNew by remember { mutableStateOf(false) }
-    var pins by remember { mutableStateOf(prefs.getStringSet("pins", emptySet())!!.toSet()) }
-    var sidebarPkgs by remember { mutableStateOf(prefs.getStringSet("sidebar_pkgs", emptySet())!!.toSet()) }
+    var pins by remember { mutableStateOf(prefs.getStringSet("pins", emptySet()).orEmpty().toSet()) }
+    var sidebarPkgs by remember { mutableStateOf(prefs.getStringSet("sidebar_pkgs", emptySet()).orEmpty().toSet()) }
     var pausePkg by remember { mutableStateOf<String?>(null) }
 
     val apps = remember {

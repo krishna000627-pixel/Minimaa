@@ -68,6 +68,7 @@ object DbModule {
     fun db(@ApplicationContext c: Context): AppDb =
         Room.databaseBuilder(c, AppDb::class.java, "minimaa.db")
             .addMigrations(MIGRATION_1_2)
+            .fallbackToDestructiveMigration()
             .build()
 
     @Provides fun dao(db: AppDb): LoopDao = db.dao()

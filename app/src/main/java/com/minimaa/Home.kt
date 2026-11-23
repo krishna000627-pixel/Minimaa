@@ -148,17 +148,17 @@ private fun DotEqualizer(isPlaying: Boolean, modifier: Modifier = Modifier) {
     }
 }
 
-private fun batteryLevel(ctx: Context): Int {
+private fun batteryLevel(ctx: Context): Int = runCatching {
     val bm = ctx.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
-    return bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)?.coerceIn(0, 100) ?: 100
-}
+    bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)?.coerceIn(0, 100) ?: 100
+}.getOrDefault(100)
 
-private fun hasNetwork(ctx: Context): Boolean {
+private fun hasNetwork(ctx: Context): Boolean = runCatching {
     val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
     val net = cm.activeNetwork ?: return false
     val caps = cm.getNetworkCapabilities(net) ?: return false
-    return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-}
+    caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}.getOrDefault(false)
 
 @Composable
 fun HomePagerScreen(
