@@ -20,8 +20,8 @@ android {
         applicationId = "com.minimaa"
         minSdk = 26
         targetSdk = 34
-        versionCode = 16
-        versionName = "16"
+        versionCode = 17
+        versionName = "17"
     }
     signingConfigs {
         create("release") {

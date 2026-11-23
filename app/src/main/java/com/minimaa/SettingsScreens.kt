@@ -304,7 +304,6 @@ fun SettingsScreen(vm: LoopVM, journals: List<Journal>, tasks: List<Task>, onThe
     }
 }
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeSettingsScreen(
