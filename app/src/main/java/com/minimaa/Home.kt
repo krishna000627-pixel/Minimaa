@@ -1625,7 +1625,7 @@ fun DrawerScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             Icon(Icons.Default.Search, null, tint = Ink, modifier = Modifier.size(18.dp))
-                            Text("Search web for "$q"", color = Ink, fontSize = 14.sp)
+                            Text("Search web for '$q'", color = Ink, fontSize = 14.sp)
                         }
                     }
                 }
@@ -1705,7 +1705,28 @@ fun DrawerScreen(
                             }
                         }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(60.dp).clip(CircleShape).clickable { vaultUnlocked = true }, contentAlignment = Alignment.Center) {
+                            Box(Modifier.size(60.dp).clip(CircleShape).clickable {
+                                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                                    runCatching {
+                                        val bp = android.hardware.biometrics.BiometricPrompt.Builder(ctx)
+                                            .setTitle("Private Space")
+                                            .setSubtitle("Unlock with biometrics")
+                                            .setNegativeButton("Cancel", ctx.mainExecutor) { _, _ -> }
+                                            .build()
+                                        bp.authenticate(
+                                            android.os.CancellationSignal(),
+                                            ctx.mainExecutor,
+                                            object : android.hardware.biometrics.BiometricPrompt.AuthenticationCallback() {
+                                                override fun onAuthenticationSucceeded(result: android.hardware.biometrics.BiometricPrompt.AuthenticationResult?) {
+                                                    vaultUnlocked = true
+                                                }
+                                            }
+                                        )
+                                    }.onFailure { vaultUnlocked = true }
+                                } else {
+                                    vaultUnlocked = true
+                                }
+                            }, contentAlignment = Alignment.Center) {
                                 Icon(Icons.Default.Fingerprint, null, tint = Ink, modifier = Modifier.size(26.dp))
                             }
                             Box(Modifier.size(60.dp).clip(CircleShape).clickable {
@@ -1741,8 +1762,7 @@ fun DrawerScreen(
                     val vaultApps = apps.filter { it.pkg in privatePkgs }
                     if (vaultApps.isEmpty()) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No apps in Private Space yet.
-Long-press an app in the drawer to move it here.", color = Dim, fontSize = 13.sp, textAlign = TextAlign.Center)
+                            Text("No apps in Private Space yet.\nLong-press an app in the drawer to move it here.", color = Dim, fontSize = 13.sp, textAlign = TextAlign.Center)
                         }
                     } else {
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {

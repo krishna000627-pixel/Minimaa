@@ -242,6 +242,17 @@ fun SettingsScreen(vm: LoopVM, journals: List<Journal>, tasks: List<Task>, onThe
                             .clickable {
                                 selectedLang = lang
                                 prefs.edit().putString("app_lang", lang).apply()
+                                val tag = when (lang) {
+                                    "Deutsch" -> "de"; "English" -> "en"; "Español" -> "es"
+                                    "Français" -> "fr"; "हिन्दी" -> "hi"; "日本語" -> "ja"
+                                    "Português" -> "pt"; "中文" -> "zh"; else -> ""
+                                }
+                                val loc = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale(tag)
+                                java.util.Locale.setDefault(loc)
+                                val cfg = ctx.resources.configuration
+                                cfg.setLocale(loc)
+                                @Suppress("DEPRECATION")
+                                ctx.resources.updateConfiguration(cfg, ctx.resources.displayMetrics)
                                 showLangSheet = false
                             }
                             .padding(horizontal = 24.dp, vertical = 14.dp),
@@ -799,10 +810,10 @@ fun DrawerFoldersScreen(apps: List<AppInfo>, onBack: () -> Unit) {
             DetoxToggleRow("Folders at Top", "Show app groups above the main list.", foldersTop) {
                 foldersTop = it; prefs.edit().putBoolean("folder_top", it).apply()
             }
-            DetoxToggleRow("Folder Action in Menu", "Add "Create Folder" to app long-press options.", folderMenu) {
+            DetoxToggleRow("Folder Action in Menu", "Add 'Create Folder' to app long-press options.", folderMenu) {
                 folderMenu = it; prefs.edit().putBoolean("folder_menu", it).apply()
             }
-            DetoxToggleRow("Show Quick Edit", "Show "ADD APPS" button in the folder sheet.", quickEdit) {
+            DetoxToggleRow("Show Quick Edit", "Show 'ADD APPS' button in the folder sheet.", quickEdit) {
                 quickEdit = it; prefs.edit().putBoolean("folder_quick_edit", it).apply()
             }
             Spacer(Modifier.height(16.dp))
