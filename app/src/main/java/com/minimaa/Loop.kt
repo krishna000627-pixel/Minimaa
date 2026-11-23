@@ -80,7 +80,7 @@ fun TopBar(title: String, onBack: () -> Unit, trailing: @Composable () -> Unit =
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White) }
+        IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Ink) }
         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
             Text(title, color = Dim, fontSize = 12.sp, letterSpacing = 3.sp)
         }
@@ -178,7 +178,7 @@ fun LoopScreen(
                                         }
                                     }
                                     Spacer(Modifier.height(6.dp))
-                                    Text(j.text, color = Color.White, fontSize = 16.sp)
+                                    Text(j.text, color = Ink, fontSize = 16.sp)
                                     if (branches.isNotEmpty()) {
                                         Spacer(Modifier.height(8.dp))
                                         branches.forEach { b ->
@@ -257,7 +257,7 @@ fun LoopScreen(
                         Row(
                             Modifier
                                 .clip(RoundedCornerShape(50))
-                                .then(if (selected) Modifier.background(Color.White) else Modifier)
+                                .then(if (selected) Modifier.background(Ink) else Modifier)
                                 .clickable { tab = idx }
                                 .padding(horizontal = if (selected) 16.dp else 14.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -266,7 +266,7 @@ fun LoopScreen(
                             Icon(
                                 icon,
                                 contentDescription = label,
-                                tint = if (selected) Color.Black else Dim,
+                                tint = if (selected) InvInk else Dim,
                                 modifier = Modifier.size(18.dp)
                             )
                             if (selected) {
@@ -275,7 +275,7 @@ fun LoopScreen(
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.5.sp,
-                                    color = Color.Black
+                                    color = InvInk
                                 )
                             }
                         }
@@ -287,7 +287,7 @@ fun LoopScreen(
                         Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color.White)
+                            .background(Ink)
                             .clickable {
                                 if (tab == 0) {
                                     editingJournal = null
@@ -299,7 +299,7 @@ fun LoopScreen(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.Black, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.Add, contentDescription = "Add", tint = InvInk, modifier = Modifier.size(24.dp))
                     }
                 }
             }
@@ -331,8 +331,8 @@ fun LoopScreen(
     if (showSettings) {
         AlertDialog(
             onDismissRequest = { showSettings = false },
-            containerColor = Color(0xFF101010),
-            title = { Text("DAILY LOOP SETTINGS", color = Color.White, fontSize = 14.sp, letterSpacing = 2.sp) },
+            containerColor = SheetCol,
+            title = { Text("DAILY LOOP SETTINGS", color = Ink, fontSize = 14.sp, letterSpacing = 2.sp) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("Total active journals: ${journals.size}", color = Dim, fontSize = 13.sp)
@@ -341,7 +341,7 @@ fun LoopScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showSettings = false }) { Text("DONE", color = Color.White) }
+                TextButton(onClick = { showSettings = false }) { Text("DONE", color = Ink) }
             }
         )
     }
@@ -382,8 +382,8 @@ private fun UniversalSearchTab(
                     value = query,
                     onValueChange = onQueryChange,
                     singleLine = true,
-                    cursorBrush = SolidColor(Color.White),
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
+                    cursorBrush = SolidColor(Ink),
+                    textStyle = androidx.compose.ui.text.TextStyle(color = Ink, fontSize = 14.sp),
                     modifier = Modifier.fillMaxWidth(),
                     decorationBox = { inner ->
                         if (query.isEmpty()) Text("SEARCH NOTES & TASKS...", color = Dim, fontSize = 12.sp, letterSpacing = 1.sp)
@@ -395,12 +395,12 @@ private fun UniversalSearchTab(
                 Modifier
                     .size(46.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .border(1.dp, if (filterMood != -1 || filterCategory != "ALL CATEGORIES") Color.White else Line, RoundedCornerShape(14.dp))
+                    .border(1.dp, if (filterMood != -1 || filterCategory != "ALL CATEGORIES") Ink else Line, RoundedCornerShape(14.dp))
                     .background(Card)
                     .clickable { onOpenFilter() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Tune, contentDescription = "Filter Search", tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Tune, contentDescription = "Filter Search", tint = Ink, modifier = Modifier.size(18.dp))
             }
         }
 
@@ -442,7 +442,7 @@ private fun UniversalSearchTab(
                     ) {
                         Text("JOURNAL · ${MOODS.getOrElse(j.mood) { "NEUTRAL" }}", color = Dim, fontSize = 10.sp, letterSpacing = 1.5.sp)
                         Spacer(Modifier.height(4.dp))
-                        Text(j.text, color = Color.White, fontSize = 15.sp)
+                        Text(j.text, color = Ink, fontSize = 15.sp)
                     }
                 }
                 items(tr, key = { "st${it.id}" }) { t ->
@@ -457,7 +457,7 @@ private fun UniversalSearchTab(
                     ) {
                         Text("${t.type} · ${t.category.uppercase()}", color = Dim, fontSize = 10.sp, letterSpacing = 1.5.sp)
                         Spacer(Modifier.height(4.dp))
-                        Text(t.title, color = Color.White, fontSize = 15.sp)
+                        Text(t.title, color = Ink, fontSize = 15.sp)
                     }
                 }
             }
@@ -476,7 +476,7 @@ private fun FilterSearchSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF0A0A0A),
+        containerColor = SheetCol,
         dragHandle = {
             Box(
                 Modifier
@@ -495,7 +495,7 @@ private fun FilterSearchSheet(
                 .padding(bottom = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("FILTER SEARCH", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
+            Text("FILTER SEARCH", color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
             Spacer(Modifier.height(18.dp))
             Text("MOOD VIBE", color = Dim, fontSize = 10.sp, letterSpacing = 2.sp)
             Spacer(Modifier.height(10.dp))
@@ -511,17 +511,17 @@ private fun FilterSearchSheet(
                                     .weight(1f)
                                     .height(42.dp)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .border(1.dp, if (selected) Color.White else Line, RoundedCornerShape(10.dp))
+                                    .border(1.dp, if (selected) Ink else Line, RoundedCornerShape(10.dp))
                                     .background(Card)
                                     .clickable { onSelectMood(idx) },
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 if (idx >= 0) {
-                                    Icon(MOOD_ICONS[idx], null, tint = if (selected) Color.White else Dim, modifier = Modifier.size(13.dp))
+                                    Icon(MOOD_ICONS[idx], null, tint = if (selected) Ink else Dim, modifier = Modifier.size(13.dp))
                                     Spacer(Modifier.width(5.dp))
                                 }
-                                Text(label, color = if (selected) Color.White else Dim, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                                Text(label, color = if (selected) Ink else Dim, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                             }
                         }
                         if (row.size < 3) Spacer(Modifier.weight((3 - row.size).toFloat()))
@@ -544,12 +544,12 @@ private fun FilterSearchSheet(
                                     .weight(1f)
                                     .height(42.dp)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .border(1.dp, if (selected) Color.White else Line, RoundedCornerShape(10.dp))
+                                    .border(1.dp, if (selected) Ink else Line, RoundedCornerShape(10.dp))
                                     .background(Card)
                                     .clickable { onSelectCategory(cat) },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(cat, color = if (selected) Color.White else Dim, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                                Text(cat, color = if (selected) Ink else Dim, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                             }
                         }
                     }
@@ -583,7 +583,7 @@ private fun RecycleBinTab(
                 ) {
                     Text(
                         label,
-                        color = if (selected) Color.White else Dim,
+                        color = if (selected) Ink else Dim,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp
@@ -593,7 +593,7 @@ private fun RecycleBinTab(
                         Modifier
                             .width(64.dp)
                             .height(2.dp)
-                            .background(if (selected) Color.White else Color.Transparent)
+                            .background(if (selected) Ink else Color.Transparent)
                     )
                 }
             }
@@ -656,7 +656,7 @@ private fun BinCard(deletedAt: Long, text: String, onRestore: () -> Unit, onDele
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onRestore, modifier = Modifier.size(30.dp)) {
-                Icon(Icons.Default.History, contentDescription = "Restore", tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.History, contentDescription = "Restore", tint = Ink, modifier = Modifier.size(18.dp))
             }
             Spacer(Modifier.width(8.dp))
             IconButton(onClick = onDelete, modifier = Modifier.size(30.dp)) {
@@ -688,7 +688,7 @@ private fun EmptyJournal(onBegin: () -> Unit) {
                 .clickable { onBegin() }
                 .padding(horizontal = 24.dp, vertical = 12.dp)
         ) {
-            Text("BEGIN JOURNAL", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+            Text("BEGIN JOURNAL", color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
         }
     }
 }
@@ -715,10 +715,10 @@ private fun JournalEditorScreen(
                 .padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White) }
+            IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Ink) }
             Column(Modifier.weight(1f)) {
                 Text("JOURNAL ENTRY", color = Dim, fontSize = 10.sp, letterSpacing = 2.sp)
-                Text(dateLabel, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(dateLabel, color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             }
             IconButton(onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFB73A3A))
@@ -733,8 +733,8 @@ private fun JournalEditorScreen(
             BasicTextField(
                 value = text,
                 onValueChange = { text = it },
-                cursorBrush = SolidColor(Color.White),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 18.sp, lineHeight = 26.sp),
+                cursorBrush = SolidColor(Ink),
+                textStyle = androidx.compose.ui.text.TextStyle(color = Ink, fontSize = 18.sp, lineHeight = 26.sp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -758,7 +758,7 @@ private fun JournalEditorScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(Icons.Default.AccountTree, null, tint = Dim, modifier = Modifier.size(14.dp))
-                        Text(b, color = Color.White, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        Text(b, color = Ink, fontSize = 13.sp, modifier = Modifier.weight(1f))
                         Text(
                             "×",
                             color = Dim,
@@ -788,7 +788,7 @@ private fun JournalEditorScreen(
                     .background(Color(0xFF1A1A1A)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Book, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Book, contentDescription = null, tint = Ink, modifier = Modifier.size(18.dp))
             }
             IconButton(onClick = { showBranchSheet = true }, modifier = Modifier.size(38.dp)) {
                 Icon(Icons.Default.AccountTree, contentDescription = "New Branch", tint = Dim, modifier = Modifier.size(18.dp))
@@ -806,7 +806,7 @@ private fun JournalEditorScreen(
                 Icon(
                     MOOD_ICONS.getOrElse(mood) { Icons.Default.SentimentNeutral },
                     contentDescription = "Mood",
-                    tint = Color.White,
+                    tint = Ink,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -818,7 +818,7 @@ private fun JournalEditorScreen(
                     .clickable { if (text.isNotBlank()) onSave(text.trim(), mood, branches) else onBack() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Check, contentDescription = "Save", tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Check, contentDescription = "Save", tint = Ink, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -826,7 +826,7 @@ private fun JournalEditorScreen(
     if (showMoodSheet) {
         ModalBottomSheet(
             onDismissRequest = { showMoodSheet = false },
-            containerColor = Color(0xFF0A0A0A),
+            containerColor = SheetCol,
             dragHandle = {
                 Box(
                     Modifier
@@ -845,7 +845,7 @@ private fun JournalEditorScreen(
                     .padding(bottom = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("HOW ARE YOU FEELING?", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
+                Text("HOW ARE YOU FEELING?", color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
                 Spacer(Modifier.height(26.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     MOOD_ICONS.forEachIndexed { idx, icon ->
@@ -854,14 +854,14 @@ private fun JournalEditorScreen(
                             Modifier
                                 .size(52.dp)
                                 .clip(CircleShape)
-                                .then(if (selected) Modifier.background(Color.White) else Modifier)
+                                .then(if (selected) Modifier.background(Ink) else Modifier)
                                 .clickable { mood = idx; showMoodSheet = false },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 icon,
                                 contentDescription = MOODS[idx],
-                                tint = if (selected) Color.Black else Color.White,
+                                tint = if (selected) InvInk else Ink,
                                 modifier = Modifier.size(26.dp)
                             )
                         }
@@ -875,7 +875,7 @@ private fun JournalEditorScreen(
         var branchText by remember { mutableStateOf("") }
         ModalBottomSheet(
             onDismissRequest = { showBranchSheet = false },
-            containerColor = Color(0xFF0A0A0A),
+            containerColor = SheetCol,
             dragHandle = {
                 Box(
                     Modifier
@@ -894,14 +894,14 @@ private fun JournalEditorScreen(
                     .padding(bottom = 24.dp)
             ) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("NEW BRANCH", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
+                    Text("NEW BRANCH", color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.5.sp)
                 }
                 Spacer(Modifier.height(22.dp))
                 BasicTextField(
                     value = branchText,
                     onValueChange = { branchText = it },
-                    cursorBrush = SolidColor(Color.White),
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 17.sp),
+                    cursorBrush = SolidColor(Ink),
+                    textStyle = androidx.compose.ui.text.TextStyle(color = Ink, fontSize = 17.sp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 72.dp),
@@ -916,7 +916,7 @@ private fun JournalEditorScreen(
                         if (branchText.isNotBlank()) branches = branches + branchText.trim()
                         showBranchSheet = false
                     }) {
-                        Text("SAVE", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                        Text("SAVE", color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                     }
                 }
             }
@@ -952,19 +952,19 @@ private fun TodoTab(
 
     Column(Modifier.fillMaxSize()) {
         Spacer(Modifier.height(8.dp))
-        Text("Today,", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Normal)
+        Text("Today,", color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Normal)
         Spacer(Modifier.height(4.dp))
         Text(
             buildAnnotatedString {
                 withStyle(SpanStyle(color = Dim)) { append("You have ") }
-                withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+                withStyle(SpanStyle(color = Ink, fontWeight = FontWeight.Bold)) {
                     append("$reminders ${if (reminders == 1) "reminder" else "reminders"}, ")
                 }
-                withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+                withStyle(SpanStyle(color = Ink, fontWeight = FontWeight.Bold)) {
                     append("$todos ${if (todos == 1) "task" else "tasks"}, ")
                 }
                 withStyle(SpanStyle(color = Dim)) { append("and ") }
-                withStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+                withStyle(SpanStyle(color = Ink, fontWeight = FontWeight.Bold)) {
                     append("$habits ${if (habits == 1) "habit" else "habits"}.")
                 }
             },
@@ -986,12 +986,12 @@ private fun TodoTab(
                     val active = showCompleted == isDone
                     Text(
                         label,
-                        color = if (active) Color.Black else Dim,
+                        color = if (active) InvInk else Dim,
                         fontSize = 13.sp,
                         fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .then(if (active) Modifier.background(Color.White) else Modifier)
+                            .then(if (active) Modifier.background(Ink) else Modifier)
                             .clickable { showCompleted = isDone }
                             .padding(horizontal = 20.dp, vertical = 8.dp)
                     )
@@ -1050,10 +1050,10 @@ private fun SectionHeader(title: String, expanded: Boolean, onToggle: () -> Unit
         Icon(
             if (expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowRight,
             contentDescription = null,
-            tint = Color.White,
+            tint = Ink,
             modifier = Modifier.size(18.dp)
         )
-        Text(title, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+        Text(title, color = Ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
     }
 }
 
@@ -1072,13 +1072,13 @@ private fun TaskRow(t: Task, onToggle: () -> Unit, onEdit: () -> Unit, onTrash: 
             Modifier
                 .size(22.dp)
                 .clip(RoundedCornerShape(6.dp))
-                .border(1.5.dp, if (t.done) Color.White else Color(0xFF555555), RoundedCornerShape(6.dp))
-                .then(if (t.done) Modifier.background(Color.White) else Modifier)
+                .border(1.5.dp, if (t.done) Ink else Color(0xFF555555), RoundedCornerShape(6.dp))
+                .then(if (t.done) Modifier.background(Ink) else Modifier)
                 .clickable { onToggle() },
             contentAlignment = Alignment.Center
         ) {
             if (t.done) {
-                Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black, modifier = Modifier.size(14.dp))
+                Icon(Icons.Default.Check, contentDescription = null, tint = InvInk, modifier = Modifier.size(14.dp))
             } else {
                 Box(Modifier.size(4.dp).clip(CircleShape).background(Color(0xFF555555)))
             }
@@ -1087,7 +1087,7 @@ private fun TaskRow(t: Task, onToggle: () -> Unit, onEdit: () -> Unit, onTrash: 
         Column(Modifier.weight(1f)) {
             Text(
                 t.title,
-                color = if (t.done) Dim else Color.White,
+                color = if (t.done) Dim else Ink,
                 fontSize = 16.sp,
                 textDecoration = if (t.done) TextDecoration.LineThrough else null
             )
@@ -1136,7 +1136,7 @@ fun IntentionSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF0A0A0A),
+        containerColor = SheetCol,
         dragHandle = {
             Box(
                 Modifier
@@ -1157,7 +1157,7 @@ fun IntentionSheet(
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     if (existing == null) "NEW INTENTION" else "EDIT INTENTION",
-                    color = Color.White,
+                    color = Ink,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.5.sp
@@ -1167,8 +1167,8 @@ fun IntentionSheet(
             BasicTextField(
                 value = title,
                 onValueChange = { title = it },
-                cursorBrush = SolidColor(Color.White),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 18.sp),
+                cursorBrush = SolidColor(Ink),
+                textStyle = androidx.compose.ui.text.TextStyle(color = Ink, fontSize = 18.sp),
                 modifier = Modifier.fillMaxWidth(),
                 decorationBox = { inner ->
                     if (title.isEmpty()) Text("What needs doing?", color = Color(0xFF555555), fontSize = 18.sp)
@@ -1199,15 +1199,15 @@ fun IntentionSheet(
                         Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(50))
-                            .then(if (selected) Modifier.background(Color.White) else Modifier)
+                            .then(if (selected) Modifier.background(Ink) else Modifier)
                             .clickable { type = key }
                             .padding(vertical = 10.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(icon, null, tint = if (selected) Color.Black else Dim, modifier = Modifier.size(14.dp))
+                        Icon(icon, null, tint = if (selected) InvInk else Dim, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(label, color = if (selected) Color.Black else Dim, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                        Text(label, color = if (selected) InvInk else Dim, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     }
                 }
             }
@@ -1253,7 +1253,7 @@ fun IntentionSheet(
                     Spacer(Modifier.width(8.dp))
                     Text(
                         if (defaultScheduledAt > 0L && schedIdx == 1) fmtShort(scheduledAt) else scheduleOptions[schedIdx].second,
-                        color = if (schedIdx == 0) Dim else Color.White,
+                        color = if (schedIdx == 0) Dim else Ink,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.5.sp
@@ -1264,7 +1264,7 @@ fun IntentionSheet(
                         .weight(0.8f)
                         .height(46.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
+                        .background(Ink)
                         .clickable {
                             if (title.isNotBlank()) {
                                 onSave(title.trim(), type, category.lowercase().replaceFirstChar { it.uppercase() }, priority.lowercase().replaceFirstChar { it.uppercase() }, scheduledAt)
@@ -1272,7 +1272,7 @@ fun IntentionSheet(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("SAVE", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                    Text("SAVE", color = InvInk, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 }
             }
         }
@@ -1296,7 +1296,7 @@ private fun SelectorPill(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+        Text(label, color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
         Icon(icon, null, tint = Dim, modifier = Modifier.size(15.dp))
     }
 }

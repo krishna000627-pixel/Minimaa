@@ -113,7 +113,7 @@ fun CalcScreen(onBack: () -> Unit) {
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
-            Text(disp, color = Color.White, fontSize = 64.sp, fontWeight = FontWeight.Light, maxLines = 1)
+            Text(disp, color = Ink, fontSize = 64.sp, fontWeight = FontWeight.Light, maxLines = 1)
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(Line))
         Spacer(Modifier.height(10.dp))
@@ -144,7 +144,7 @@ fun CalcScreen(onBack: () -> Unit) {
                     ) {
                         Text(
                             k,
-                            color = if (isOp) Color.White else Dim,
+                            color = if (isOp) Ink else Dim,
                             fontSize = if (k == "DEL") 14.sp else 20.sp,
                             fontWeight = if (isOp) FontWeight.Bold else FontWeight.Normal
                         )
@@ -158,15 +158,15 @@ fun CalcScreen(onBack: () -> Unit) {
     if (showHistory) {
         AlertDialog(
             onDismissRequest = { showHistory = false },
-            containerColor = Color(0xFF101010),
-            title = { Text("HISTORY", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            containerColor = SheetCol,
+            title = { Text("HISTORY", color = Ink, fontSize = 13.sp, letterSpacing = 2.sp) },
             text = {
                 if (history.isEmpty()) Text("No calculations yet.", color = Dim, fontSize = 13.sp)
                 else Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    history.take(8).forEach { Text(it, color = Color.White, fontSize = 14.sp) }
+                    history.take(8).forEach { Text(it, color = Ink, fontSize = 14.sp) }
                 }
             },
-            confirmButton = { TextButton({ showHistory = false }) { Text("CLOSE", color = Color.White) } },
+            confirmButton = { TextButton({ showHistory = false }) { Text("CLOSE", color = Ink) } },
             dismissButton = {
                 if (history.isNotEmpty()) TextButton({ history = emptyList() }) { Text("CLEAR", color = Dim) }
             }
@@ -217,7 +217,7 @@ fun PomoScreen(onBack: () -> Unit) {
                 .background(Card),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Timer, null, tint = Color.White, modifier = Modifier.size(34.dp))
+            Icon(Icons.Default.Timer, null, tint = Ink, modifier = Modifier.size(34.dp))
         }
 
         Spacer(Modifier.height(22.dp))
@@ -229,7 +229,7 @@ fun PomoScreen(onBack: () -> Unit) {
                     Modifier
                         .size(7.dp)
                         .clip(CircleShape)
-                        .background(if (i < (sessions % 4)) Color.White else Color(0xFF2B2B2B))
+                        .background(if (i < (sessions % 4)) Ink else Color(0xFF2B2B2B))
                 )
             }
         }
@@ -239,7 +239,7 @@ fun PomoScreen(onBack: () -> Unit) {
         Spacer(Modifier.height(6.dp))
         Text(
             "%02d:%02d".format(left / 60, left % 60),
-            color = if (running) Color.White else Color(0xFF888888),
+            color = if (running) Ink else Color(0xFF888888),
             fontSize = 72.sp,
             fontWeight = FontWeight.Bold
         )
@@ -257,14 +257,14 @@ fun PomoScreen(onBack: () -> Unit) {
                 Modifier
                     .size(72.dp)
                     .clip(CircleShape)
-                    .border(1.dp, Color.White, CircleShape)
+                    .border(1.dp, Ink, CircleShape)
                     .clickable { running = !running },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     if (running) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = "Start/Pause",
-                    tint = Color.White,
+                    tint = Ink,
                     modifier = Modifier.size(30.dp)
                 )
             }
@@ -281,21 +281,21 @@ fun PomoScreen(onBack: () -> Unit) {
     if (showSettings) {
         AlertDialog(
             onDismissRequest = { showSettings = false },
-            containerColor = Color(0xFF101010),
-            title = { Text("POMODORO SETTINGS", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            containerColor = SheetCol,
+            title = { Text("POMODORO SETTINGS", color = Ink, fontSize = 13.sp, letterSpacing = 2.sp) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Work duration", color = Color.White, fontSize = 14.sp)
+                        Text("Work duration", color = Ink, fontSize = 14.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf(15, 25, 45).forEach { m ->
                                 Text(
                                     "${m}m",
-                                    color = if (workMins == m) Color.Black else Dim,
+                                    color = if (workMins == m) InvInk else Dim,
                                     fontSize = 12.sp,
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(if (workMins == m) Color.White else Card)
+                                        .background(if (workMins == m) Ink else Card)
                                         .clickable {
                                             workMins = m
                                             prefs.edit().putInt("pomo_work", m).apply()
@@ -307,16 +307,16 @@ fun PomoScreen(onBack: () -> Unit) {
                         }
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Break duration", color = Color.White, fontSize = 14.sp)
+                        Text("Break duration", color = Ink, fontSize = 14.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf(5, 10, 15).forEach { m ->
                                 Text(
                                     "${m}m",
-                                    color = if (breakMins == m) Color.Black else Dim,
+                                    color = if (breakMins == m) InvInk else Dim,
                                     fontSize = 12.sp,
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
-                                        .background(if (breakMins == m) Color.White else Card)
+                                        .background(if (breakMins == m) Ink else Card)
                                         .clickable {
                                             breakMins = m
                                             prefs.edit().putInt("pomo_break", m).apply()
@@ -329,7 +329,7 @@ fun PomoScreen(onBack: () -> Unit) {
                     }
                 }
             },
-            confirmButton = { TextButton({ showSettings = false }) { Text("DONE", color = Color.White) } }
+            confirmButton = { TextButton({ showSettings = false }) { Text("DONE", color = Ink) } }
         )
     }
 }
@@ -363,7 +363,7 @@ fun CalendarScreen(
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             TopBar("CALENDAR", onBack) {
-                IconButton(onOpenSettings) { Icon(Icons.Default.Settings, null, tint = Color.White) }
+                IconButton(onOpenSettings) { Icon(Icons.Default.Settings, null, tint = Ink) }
             }
 
             Column(Modifier.fillMaxSize().padding(horizontal = 24.dp)) {
@@ -376,7 +376,7 @@ fun CalendarScreen(
                     Column {
                         Text(
                             currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase(),
-                            color = Color.White,
+                            color = Ink,
                             fontSize = 28.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 1.sp
@@ -420,7 +420,7 @@ fun CalendarScreen(
                                             .aspectRatio(1f)
                                             .clip(RoundedCornerShape(10.dp))
                                             .then(
-                                                if (isSel) Modifier.background(Color.White)
+                                                if (isSel) Modifier.background(Ink)
                                                 else Modifier.border(1.dp, Line, RoundedCornerShape(10.dp)).background(Card)
                                             )
                                             .clickable { selectedDate = date },
@@ -428,7 +428,7 @@ fun CalendarScreen(
                                     ) {
                                         Text(
                                             "$dayNum",
-                                            color = if (isSel) Color.Black else Color.White,
+                                            color = if (isSel) InvInk else Ink,
                                             fontSize = 13.sp,
                                             fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal
                                         )
@@ -453,7 +453,7 @@ fun CalendarScreen(
                 ) {
                     Text(
                         "${selectedDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${selectedDate.dayOfMonth}",
-                        color = Color.White,
+                        color = Ink,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp
@@ -463,7 +463,7 @@ fun CalendarScreen(
                         Icon(
                             Icons.Default.AddCircleOutline,
                             contentDescription = "Add Task",
-                            tint = Color.White,
+                            tint = Ink,
                             modifier = Modifier.size(18.dp).clickable { showAddSheet = true }
                         )
                     }
@@ -487,7 +487,7 @@ fun CalendarScreen(
                                     .padding(14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(t.title, color = if (t.done) Dim else Color.White, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                                Text(t.title, color = if (t.done) Dim else Ink, fontSize = 15.sp, modifier = Modifier.weight(1f))
                                 Text(t.type, color = Dim, fontSize = 10.sp, letterSpacing = 1.5.sp)
                             }
                         }
@@ -503,11 +503,11 @@ fun CalendarScreen(
                 .padding(24.dp)
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(Ink)
                 .clickable { showAddSheet = true },
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.Black, modifier = Modifier.size(26.dp))
+            Icon(Icons.Default.Add, contentDescription = "Add", tint = InvInk, modifier = Modifier.size(26.dp))
         }
     }
 
@@ -608,7 +608,7 @@ fun BodyScreen(onBack: () -> Unit) {
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("$steps", color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                    Text("$steps", color = Ink, fontSize = 36.sp, fontWeight = FontWeight.Bold)
                     Row(
                         Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -625,7 +625,7 @@ fun BodyScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 Box(Modifier.fillMaxWidth().height(2.dp).background(Color(0xFF1F1F1F))) {
                     val pct = (steps.toFloat() / stepGoal.coerceAtLeast(1)).coerceIn(0f, 1f)
-                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Color.White))
+                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Ink))
                 }
             }
 
@@ -648,13 +648,13 @@ fun BodyScreen(onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(if (mindRunning) "PAUSE" else "START", color = if (mindRunning) Color.White else Dim, fontSize = 11.sp, letterSpacing = 1.5.sp)
-                        Icon(Icons.Default.Timer, null, tint = if (mindRunning) Color.White else Dim, modifier = Modifier.size(15.dp))
+                        Text(if (mindRunning) "PAUSE" else "START", color = if (mindRunning) Ink else Dim, fontSize = 11.sp, letterSpacing = 1.5.sp)
+                        Icon(Icons.Default.Timer, null, tint = if (mindRunning) Ink else Dim, modifier = Modifier.size(15.dp))
                     }
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("$mindfulnessMins", color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                    Text("$mindfulnessMins", color = Ink, fontSize = 36.sp, fontWeight = FontWeight.Bold)
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -672,7 +672,7 @@ fun BodyScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 Box(Modifier.fillMaxWidth().height(2.dp).background(Color(0xFF1F1F1F))) {
                     val pct = (mindfulnessMins / 20f).coerceIn(0f, 1f)
-                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Color.White))
+                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Ink))
                 }
             }
 
@@ -704,7 +704,7 @@ fun BodyScreen(onBack: () -> Unit) {
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(String.format(Locale.US, "%.1f", sleepHours), color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                    Text(String.format(Locale.US, "%.1f", sleepHours), color = Ink, fontSize = 36.sp, fontWeight = FontWeight.Bold)
                     Row(
                         Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -724,7 +724,7 @@ fun BodyScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 Box(Modifier.fillMaxWidth().height(2.dp).background(Color(0xFF1F1F1F))) {
                     val pct = (sleepHours / 8f).coerceIn(0f, 1f)
-                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Color.White))
+                    Box(Modifier.fillMaxWidth(pct).height(2.dp).background(Ink))
                 }
             }
 
@@ -753,18 +753,18 @@ fun BodyScreen(onBack: () -> Unit) {
     if (showStepGoalDialog) {
         AlertDialog(
             onDismissRequest = { showStepGoalDialog = false },
-            containerColor = Color(0xFF101010),
-            title = { Text("STEP GOAL", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            containerColor = SheetCol,
+            title = { Text("STEP GOAL", color = Ink, fontSize = 13.sp, letterSpacing = 2.sp) },
             text = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(5000, 8000, 10000, 12000).forEach { g ->
                         Text(
                             "${g / 1000}k",
-                            color = if (stepGoal == g) Color.Black else Dim,
+                            color = if (stepGoal == g) InvInk else Dim,
                             fontSize = 12.sp,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (stepGoal == g) Color.White else Card)
+                                .background(if (stepGoal == g) Ink else Card)
                                 .clickable {
                                     stepGoal = g
                                     prefs.edit().putInt("body_step_goal", g).apply()
@@ -775,7 +775,7 @@ fun BodyScreen(onBack: () -> Unit) {
                     }
                 }
             },
-            confirmButton = { TextButton({ showStepGoalDialog = false }) { Text("DONE", color = Color.White) } }
+            confirmButton = { TextButton({ showStepGoalDialog = false }) { Text("DONE", color = Ink) } }
         )
     }
 }
