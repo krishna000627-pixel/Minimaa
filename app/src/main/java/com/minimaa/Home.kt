@@ -96,7 +96,8 @@ private val GLYPHS = mapOf(
 fun DotText(text: String, modifier: Modifier = Modifier) {
     val safe = text.filter { it in GLYPHS }
     if (safe.isEmpty()) return
-    val cols = (safe.sumOf { if (it == ':') 1 else 5 } + (safe.length - 1)).coerceAtLeast(1)
+    val glyphCols: Int = safe.sumOf { c: Char -> if (c == ':') 1 else 5 }
+    val cols = (glyphCols + safe.length - 1).coerceAtLeast(1)
     Canvas(modifier.aspectRatio(cols / 7f)) {
         val step = size.width / cols
         var x = 0
