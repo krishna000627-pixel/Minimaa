@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,14 +25,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit) {
     val ctx = LocalContext.current
     val prefs = remember { ctx.getSharedPreferences("minimaa", Context.MODE_PRIVATE) }
     var selectedTheme by remember { mutableIntStateOf(prefs.getInt("theme_idx", 1)) }
+    var selectedLang by remember { mutableStateOf(prefs.getString("app_lang", "System Default") ?: "System Default") }
+    var showLangSheet by remember { mutableStateOf(false) }
     var activeDialog by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxSize()) {
@@ -59,15 +65,23 @@ fun SettingsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit) {
             SettingsRow(Icons.Default.Shield, "Digital Detox", "Mindful Pause & Web Detox.") {
                 onNavigate("detox")
             }
-            SettingsRow(Icons.Default.Home, "Home Settings", "Home Apps & Appearance.") { activeDialog = "Home Settings" }
-            SettingsRow(Icons.Default.Apps, "App Drawer", "Search & Layout behavior.") { activeDialog = "App Drawer" }
-            SettingsRow(Icons.Default.Gesture, "Gestures", "Swipe & Double Tap actions.") { activeDialog = "Gestures" }
+            SettingsRow(Icons.Default.Home, "Home Settings", "Home Apps & Appearance.") {
+                onNavigate("home_settings")
+            }
+            SettingsRow(Icons.Default.Apps, "App Drawer", "Search & Layout behavior.") {
+                onNavigate("drawer_settings")
+            }
+            SettingsRow(Icons.Default.Gesture, "Gestures", "Swipe & Double Tap actions.") {
+                onNavigate("gesture_settings")
+            }
             SettingsRow(Icons.Default.Wallpaper, "Wallpaper", "Background & Immersion settings.") {
                 onNavigate("wallpaper")
             }
-            SettingsRow(Icons.Default.Language, "Language", "Change app language.") { activeDialog = "Language" }
+            SettingsRow(Icons.Default.Language, "Language", "Change app language.") {
+                showLangSheet = true
+            }
 
-            // Theme row with 4 inline circles (9220.png)
+            // Theme row with 4 inline circles
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -112,10 +126,118 @@ fun SettingsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit) {
             Spacer(Modifier.height(14.dp))
             Text("SYSTEM", color = Dim, fontSize = 11.sp, letterSpacing = 2.sp)
             Spacer(Modifier.height(8.dp))
-            SettingsRow(Icons.Default.CloudUpload, "Backup & Restore", "Export or local data snapshots") {
+            SettingsRow(Icons.Default.CloudUpload, "Backup & Restore", "Export or local data snapshots.") {
                 activeDialog = "Backup & Restore"
             }
-            Spacer(Modifier.height(24.dp))
+            SettingsRow(Icons.Default.Home, "Default Launcher", "Change Minimaa from default (don't)") {
+                runCatching { ctx.startActivity(Intent(Settings.ACTION_HOME_SETTINGS)) }
+            }
+
+            Spacer(Modifier.height(14.dp))
+            Text("SYSTEM", color = Dim, fontSize = 11.sp, letterSpacing = 2.sp)
+            Spacer(Modifier.height(8.dp))
+            SettingsRow(Icons.Default.Face, "Developer", "About Minimaa & Binge.") {
+                activeDialog = "Developer"
+            }
+
+            Spacer(Modifier.height(22.dp))
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "REPORT BUG   •   RATE APP   •   SHARE APP",
+                    color = Dim,
+                    fontSize = 10.sp,
+                    letterSpacing = 1.5.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.clickable { activeDialog = "Community" }
+                )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    "PRIVACY POLICY",
+                    color = Color(0xFF555555),
+                    fontSize = 10.sp,
+                    letterSpacing = 1.5.sp,
+                    modifier = Modifier.clickable { onNavigate("transparency") }
+                )
+                Spacer(Modifier.height(18.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    listOf(Icons.Default.Forum, Icons.Default.PhotoCamera, Icons.Default.Send).forEach { icon ->
+                        Box(
+                            Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .border(1.dp, Line, RoundedCornerShape(12.dp))
+                                .background(Card)
+                                .clickable { activeDialog = "Community" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(icon, null, tint = Dim, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(28.dp))
+        }
+    }
+
+    if (showLangSheet) {
+        val languages = listOf(
+            "System Default", "Deutsch", "English", "Español", "Français",
+            "हिन्दी", "日本語", "Português", "中文"
+        )
+        ModalBottomSheet(
+            onDismissRequest = { showLangSheet = false },
+            containerColor = Color(0xFF0A0A0A),
+            dragHandle = {
+                Box(
+                    Modifier
+                        .padding(top = 12.dp, bottom = 14.dp)
+                        .width(36.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFF555555))
+                )
+            }
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
+            ) {
+                Text(
+                    "Language",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+                Spacer(Modifier.height(6.dp))
+                languages.forEach { lang ->
+                    val active = selectedLang == lang
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .then(if (active) Modifier.background(Color(0xFF141414)) else Modifier)
+                            .clickable {
+                                selectedLang = lang
+                                prefs.edit().putString("app_lang", lang).apply()
+                                showLangSheet = false
+                            }
+                            .padding(horizontal = 24.dp, vertical = 14.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            lang,
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = if (active) FontWeight.Bold else FontWeight.Normal
+                        )
+                        if (active) {
+                            Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -127,8 +249,9 @@ fun SettingsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit) {
             text = {
                 Text(
                     when (title) {
-                        "Backup & Restore" -> "Local Room database (minimaa.db) and preferences are preserved across v3 updates via Room migration."
-                        else -> "$title is configured for minimal distraction mode."
+                        "Backup & Restore" -> "Local Room database (minimaa.db) and preferences are preserved across v5 updates via Room migration."
+                        "Developer" -> "Minimaa v5 by Binge. Built with Kotlin & Jetpack Compose for zero-distraction minimal living."
+                        else -> "Minimaa is completely offline and ad-free."
                     },
                     color = Dim,
                     fontSize = 13.sp
@@ -136,6 +259,182 @@ fun SettingsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit) {
             },
             confirmButton = { TextButton({ activeDialog = null }) { Text("OK", color = Color.White) } }
         )
+    }
+}
+
+@Composable
+fun HomeSettingsScreen(
+    apps: List<AppInfo>,
+    pins: Set<String>,
+    onTogglePin: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("minimaa", Context.MODE_PRIVATE) }
+
+    var rightPanel by remember { mutableStateOf(prefs.getBoolean("right_panel_enabled", true)) }
+    var highRefresh by remember { mutableStateOf(prefs.getBoolean("high_refresh", false)) }
+    var showHomeAppsDialog by remember { mutableStateOf(false) }
+    var showWidgetDialog by remember { mutableStateOf(false) }
+    var infoDialog by remember { mutableStateOf<String?>(null) }
+
+    var showClock by remember { mutableStateOf(prefs.getBoolean("w_clock", true)) }
+    var showCalendar by remember { mutableStateOf(prefs.getBoolean("w_cal", true)) }
+    var showMedia by remember { mutableStateOf(prefs.getBoolean("w_media", true)) }
+    var showDaysLeft by remember { mutableStateOf(prefs.getBoolean("w_days", true)) }
+
+    Column(Modifier.fillMaxSize()) {
+        TopBar("HOME SETTINGS", onBack)
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 8.dp)
+        ) {
+            SectionLabel("LAYOUT")
+            SettingsRow(Icons.Default.StarBorder, "Home Apps", "Select favorites for home screen") {
+                showHomeAppsDialog = true
+            }
+            SettingsRow(Icons.Default.Layers, "Glance Settings", "Manage segments, tasks, and journals") {
+                infoDialog = "Glance Settings"
+            }
+            DetoxToggleRow("Right Settings Panel", "Access secondary side screen", rightPanel) {
+                rightPanel = it; prefs.edit().putBoolean("right_panel_enabled", it).apply()
+            }
+
+            Spacer(Modifier.height(14.dp))
+            SectionLabel("WIDGETS & VISUALS")
+            SettingsRow(Icons.Default.Widgets, "Widget Center", "Manage clock, calendar & status bars") {
+                showWidgetDialog = true
+            }
+            SettingsRow(Icons.Default.FormatAlignLeft, "Classic Style Rules", "Configure alignment and dot visibility") {
+                infoDialog = "Classic Style Rules"
+            }
+            SettingsRow(Icons.Default.TextFields, "Typography", "Choose your global app font") {
+                infoDialog = "Typography"
+            }
+
+            Spacer(Modifier.height(14.dp))
+            SectionLabel("INTERACTION")
+            SettingsRow(Icons.Default.TouchApp, "Interaction Settings", "Gestures, haptics and letter jump") {
+                infoDialog = "Interaction Settings"
+            }
+            DetoxToggleRow(
+                "Force High Refresh Rate",
+                "Enables smooth 90Hz/120Hz scrolling on supported devices (may increase battery usage)",
+                highRefresh
+            ) {
+                highRefresh = it; prefs.edit().putBoolean("high_refresh", it).apply()
+            }
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+
+    if (showHomeAppsDialog) {
+        AlertDialog(
+            onDismissRequest = { showHomeAppsDialog = false },
+            containerColor = Color(0xFF101010),
+            title = { Text("HOME APPS", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            text = {
+                LazyColumn(Modifier.heightIn(max = 360.dp)) {
+                    items(apps, key = { it.pkg }) { app ->
+                        val checked = app.pkg in pins
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { onTogglePin(app.pkg) }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = checked,
+                                onCheckedChange = { onTogglePin(app.pkg) },
+                                colors = CheckboxDefaults.colors(checkedColor = Color.White, checkmarkColor = Color.Black)
+                            )
+                            Text(app.label, color = Color.White, fontSize = 14.sp)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton({ showHomeAppsDialog = false }) { Text("DONE", color = Color.White) } }
+        )
+    }
+
+    if (showWidgetDialog) {
+        AlertDialog(
+            onDismissRequest = { showWidgetDialog = false },
+            containerColor = Color(0xFF101010),
+            title = { Text("WIDGET CENTER", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            text = {
+                Column {
+                    DetoxToggleRow("Dot-Matrix Clock", "Show clock on home screen", showClock) {
+                        showClock = it; prefs.edit().putBoolean("w_clock", it).apply()
+                    }
+                    DetoxToggleRow("Week Calendar", "Show 7-day strip", showCalendar) {
+                        showCalendar = it; prefs.edit().putBoolean("w_cal", it).apply()
+                    }
+                    DetoxToggleRow("Media Player", "Show live music widget", showMedia) {
+                        showMedia = it; prefs.edit().putBoolean("w_media", it).apply()
+                    }
+                    DetoxToggleRow("Days Left Counter", "Show current year countdown", showDaysLeft) {
+                        showDaysLeft = it; prefs.edit().putBoolean("w_days", it).apply()
+                    }
+                }
+            },
+            confirmButton = { TextButton({ showWidgetDialog = false }) { Text("DONE", color = Color.White) } }
+        )
+    }
+
+    infoDialog?.let { title ->
+        AlertDialog(
+            onDismissRequest = { infoDialog = null },
+            containerColor = Color(0xFF101010),
+            title = { Text(title.uppercase(), color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+            text = { Text("$title defaults are active for your current Home Style.", color = Dim, fontSize = 13.sp) },
+            confirmButton = { TextButton({ infoDialog = null }) { Text("OK", color = Color.White) } }
+        )
+    }
+}
+
+@Composable
+fun AppDrawerSettingsScreen(onBack: () -> Unit) {
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("minimaa", Context.MODE_PRIVATE) }
+    var showTools by remember { mutableStateOf(prefs.getBoolean("drawer_tools", true)) }
+    var showIndex by remember { mutableStateOf(prefs.getBoolean("drawer_index", true)) }
+
+    Column(Modifier.fillMaxSize()) {
+        TopBar("APP DRAWER", onBack)
+        Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 8.dp)) {
+            SectionLabel("LAYOUT & SEARCH")
+            DetoxToggleRow("Quick Tool Shortcuts", "Show Notes, Math, Cal, Pomo & Body icons", showTools) {
+                showTools = it; prefs.edit().putBoolean("drawer_tools", it).apply()
+            }
+            DetoxToggleRow("A-Z Alphabet Scroller", "Show right-edge quick letter jump bar", showIndex) {
+                showIndex = it; prefs.edit().putBoolean("drawer_index", it).apply()
+            }
+        }
+    }
+}
+
+@Composable
+fun GesturesSettingsScreen(onBack: () -> Unit) {
+    val ctx = LocalContext.current
+    val prefs = remember { ctx.getSharedPreferences("minimaa", Context.MODE_PRIVATE) }
+    var swipeUpDrawer by remember { mutableStateOf(prefs.getBoolean("g_swipe_up", true)) }
+    var doubleTapLock by remember { mutableStateOf(prefs.getBoolean("g_double_tap", false)) }
+
+    Column(Modifier.fillMaxSize()) {
+        TopBar("GESTURES", onBack)
+        Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 8.dp)) {
+            SectionLabel("HOME GESTURES")
+            DetoxToggleRow("Swipe Up for Drawer", "Open App Drawer by swiping up on Home", swipeUpDrawer) {
+                swipeUpDrawer = it; prefs.edit().putBoolean("g_swipe_up", it).apply()
+            }
+            DetoxToggleRow("Double Tap Action", "Quick-open Daily Loop on double tap", doubleTapLock) {
+                doubleTapLock = it; prefs.edit().putBoolean("g_double_tap", it).apply()
+            }
+        }
     }
 }
 
@@ -371,7 +670,7 @@ fun TransparencyScreen(onBack: () -> Unit) {
             AuditItem(Icons.Default.DirectionsWalk, "STEP TRACKING", true, "android.permission.ACTIVITY_RECOGNITION",
                 "To detect your movement so we can show your daily step count.", Settings.ACTION_APPLICATION_DETAILS_SETTINGS),
             AuditItem(Icons.Default.Timer, "TIMER ALERTS", true, "android.permission.POST_NOTIFICATIONS",
-                "To ping you with the system notification sound when your Pomodoro sessions end.", Settings.ACTION_APP_NOTIFICATION_SETTINGS),
+                "To show silent visual reminders when your Pomodoro sessions end.", Settings.ACTION_APP_NOTIFICATION_SETTINGS),
             AuditItem(Icons.Default.Alarm, "HIGH-PRECISION TIMING", true, "android.permission.SCHEDULE_EXACT_ALARM",
                 "To ensure your task reminders and pomodoro alerts arrive at the exact second requested.", Settings.ACTION_APPLICATION_DETAILS_SETTINGS),
             AuditItem(Icons.Default.Vibration, "MOTION GESTURES", false, "android.hardware.sensor.accelerometer",

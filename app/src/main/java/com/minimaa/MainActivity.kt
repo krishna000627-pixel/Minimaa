@@ -2,7 +2,14 @@ package com.minimaa
 
 import android.content.Context
 import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -41,6 +48,43 @@ class MainActivity : ComponentActivity() {
                 Box(Modifier.fillMaxSize().background(Color.Black).systemBarsPadding()) { Root() }
             }
         }
+
+        if (showPermDialog) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = {
+                    prefs.edit().putBoolean("perms_asked", true).apply()
+                    showPermDialog = false
+                },
+                containerColor = Color(0xFF101010),
+                title = { Text("PERMISSIONS", color = Color.White, fontSize = 13.sp, letterSpacing = 2.sp) },
+                text = {
+                    Text(
+                        "Allow Notifications, Step Activity, and Notification Access for live music controls, step counter, and quick-view sidebar.",
+                        color = Dim,
+                        fontSize = 13.sp
+                    )
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        prefs.edit().putBoolean("perms_asked", true).apply()
+                        showPermDialog = false
+                        val req = mutableListOf<String>()
+                        if (Build.VERSION.SDK_INT >= 33) req.add(Manifest.permission.POST_NOTIFICATIONS)
+                        if (Build.VERSION.SDK_INT >= 29) req.add(Manifest.permission.ACTIVITY_RECOGNITION)
+                        if (req.isNotEmpty()) permLauncher.launch(req.toTypedArray())
+                        else if (!SystemBridge.isNotificationAccessEnabled(ctx)) {
+                            runCatching { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
+                        }
+                    }) { Text("ALLOW", color = Color.White) }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        prefs.edit().putBoolean("perms_asked", true).apply()
+                        showPermDialog = false
+                    }) { Text("SKIP", color = Dim) }
+                }
+            )
+        }
     }
 }
 
@@ -54,6 +98,17 @@ fun Root() {
     var pins by remember { mutableStateOf(prefs.getStringSet("pins", emptySet()).orEmpty().toSet()) }
     var sidebarPkgs by remember { mutableStateOf(prefs.getStringSet("sidebar_pkgs", emptySet()).orEmpty().toSet()) }
     var pausePkg by remember { mutableStateOf<String?>(null) }
+    var showPermDialog by remember {
+        val notifOk = SystemBridge.isNotificationAccessEnabled(ctx)
+        val postOk = Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        val asked = prefs.getBoolean("perms_asked", false)
+        mutableStateOf(!asked && (!notifOk || !postOk))
+    }
+    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (!SystemBridge.isNotificationAccessEnabled(ctx)) {
+            runCatching { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
+        }
+    }
 
     val apps = remember {
         val pm = ctx.packageManager
@@ -69,7 +124,7 @@ fun Root() {
 
     BackHandler(screen != "home") {
         screen = when (screen) {
-            "detox", "wallpaper", "transparency" -> "settings"
+            "detox", "wallpaper", "transparency", "home_settings", "drawer_settings", "gesture_settings" -> "settings"
             else -> "home"
         }
     }
@@ -110,6 +165,7 @@ fun Root() {
                     screen = "loop"
                 },
                 launch = ::launch,
+                togglePin = ::togglePin,
                 onSaveSidebarPkgs = ::saveSidebarPkgs
             )
             "drawer" -> DrawerScreen(apps, pins, { screen = it }, ::launch, ::togglePin) { screen = "home" }
@@ -131,6 +187,9 @@ fun Root() {
             "detox" -> DigitalDetoxScreen { screen = "settings" }
             "wallpaper" -> WallpaperSettingsScreen { screen = "settings" }
             "transparency" -> TransparencyScreen { screen = "settings" }
+            "home_settings" -> HomeSettingsScreen(apps, pins, ::togglePin) { screen = "settings" }
+            "drawer_settings" -> AppDrawerSettingsScreen { screen = "settings" }
+            "gesture_settings" -> GesturesSettingsScreen { screen = "settings" }
         }
 
         // 3-second Mindful Pause overlay when enabled in Digital Detox
