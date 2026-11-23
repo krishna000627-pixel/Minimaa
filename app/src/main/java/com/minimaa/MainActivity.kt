@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,7 +39,11 @@ fun Root() {
     val ctx = LocalContext.current
     val prefs = remember { ctx.getSharedPreferences("minimaa", Context.MODE_PRIVATE) }
     var screen by remember { mutableStateOf("home") }
+    var loopInitialTab by remember { mutableIntStateOf(0) }
+    var loopOpenNew by remember { mutableStateOf(false) }
     var pins by remember { mutableStateOf(prefs.getStringSet("pins", emptySet())!!.toSet()) }
+    var sidebarPkgs by remember { mutableStateOf(prefs.getStringSet("sidebar_pkgs", emptySet())!!.toSet()) }
+
     val apps = remember {
         val pm = ctx.packageManager
         pm.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0)
@@ -48,17 +53,52 @@ fun Root() {
             .sortedBy { it.label.lowercase() }
     }
     val vm: LoopVM = viewModel()
+    val journals by vm.journals.collectAsStateWithLifecycle()
+    val tasks by vm.tasks.collectAsStateWithLifecycle()
+
     BackHandler(screen != "home") { screen = "home" }
+
     fun launch(pkg: String) = ctx.packageManager.getLaunchIntentForPackage(pkg)?.let { ctx.startActivity(it) }
     fun togglePin(pkg: String) {
         pins = if (pkg in pins) pins - pkg else pins + pkg
         prefs.edit().putStringSet("pins", pins).apply()
     }
+    fun saveSidebarPkgs(newPkgs: Set<String>) {
+        sidebarPkgs = newPkgs
+        prefs.edit().putStringSet("sidebar_pkgs", newPkgs).apply()
+    }
+
     when (screen) {
-        "home" -> HomeScreen(apps.filter { it.pkg in pins }, { screen = it }, ::launch)
-        "drawer" -> DrawerScreen(apps, pins, ::launch, ::togglePin) { screen = "home" }
-        "loop" -> LoopScreen(vm) { screen = "home" }
+        "home" -> HomePagerScreen(
+            apps = apps,
+            pinned = apps.filter { it.pkg in pins },
+            sidebarPkgs = sidebarPkgs,
+            journals = journals,
+            tasks = tasks,
+            go = { screen = it },
+            goLoop = { tab, openNew ->
+                loopInitialTab = tab
+                loopOpenNew = openNew
+                screen = "loop"
+            },
+            launch = ::launch,
+            onSaveSidebarPkgs = ::saveSidebarPkgs
+        )
+        "drawer" -> DrawerScreen(apps, pins, { screen = it }, ::launch, ::togglePin) { screen = "home" }
+        "loop" -> LoopScreen(vm, initialTab = loopInitialTab, initialOpenNew = loopOpenNew) {
+            loopOpenNew = false
+            screen = "home"
+        }
         "calc" -> CalcScreen { screen = "home" }
         "pomo" -> PomoScreen { screen = "home" }
+        "calendar" -> CalendarScreen(
+            tasks = tasks,
+            onSaveTask = { existing, title, type, cat, prio, sched -> vm.saveTask(existing, title, type, cat, prio, sched) },
+            onToggleTask = { vm.toggle(it) },
+            onOpenSettings = { screen = "settings" },
+            onBack = { screen = "home" }
+        )
+        "body" -> BodyScreen { screen = "home" }
+        "settings" -> SettingsScreen { screen = "home" }
     }
 }

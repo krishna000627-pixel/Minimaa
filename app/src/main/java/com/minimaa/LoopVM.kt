@@ -19,12 +19,44 @@ class LoopVM @Inject constructor(private val dao: LoopDao) : ViewModel() {
     val binT = dao.trashedTasks().hot()
 
     private fun now() = System.currentTimeMillis()
-    fun addJournal(text: String, mood: Int) = viewModelScope.launch { dao.upsertJ(Journal(text = text, mood = mood)) }
-    fun addTask(title: String, type: String) = viewModelScope.launch { dao.upsertT(Task(title = title, type = type)) }
+
+    fun saveJournal(existing: Journal?, text: String, mood: Int, branches: List<String>) = viewModelScope.launch {
+        val joined = branches.filter { it.isNotBlank() }.joinToString("\n•|•\n")
+        val item = existing?.copy(text = text, mood = mood, branches = joined)
+            ?: Journal(text = text, mood = mood, branches = joined)
+        dao.upsertJ(item)
+    }
+
+    fun saveTask(
+        existing: Task?,
+        title: String,
+        type: String,
+        category: String,
+        priority: String,
+        scheduledAt: Long
+    ) = viewModelScope.launch {
+        val item = existing?.copy(
+            title = title,
+            type = type,
+            category = category,
+            priority = priority,
+            scheduledAt = scheduledAt
+        ) ?: Task(
+            title = title,
+            type = type,
+            category = category,
+            priority = priority,
+            scheduledAt = scheduledAt
+        )
+        dao.upsertT(item)
+    }
+
     fun toggle(t: Task) = viewModelScope.launch { dao.upsertT(t.copy(done = !t.done)) }
     fun trash(j: Journal) = viewModelScope.launch { dao.upsertJ(j.copy(deleted = now())) }
     fun trash(t: Task) = viewModelScope.launch { dao.upsertT(t.copy(deleted = now())) }
     fun restore(j: Journal) = viewModelScope.launch { dao.upsertJ(j.copy(deleted = 0)) }
     fun restore(t: Task) = viewModelScope.launch { dao.upsertT(t.copy(deleted = 0)) }
+    fun deleteForever(j: Journal) = viewModelScope.launch { dao.deleteJ(j) }
+    fun deleteForever(t: Task) = viewModelScope.launch { dao.deleteT(t) }
     fun emptyBin() = viewModelScope.launch { dao.purgeJ(); dao.purgeT() }
 }
