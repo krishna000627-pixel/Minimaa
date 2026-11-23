@@ -1967,32 +1967,6 @@ private fun DrawerAppOptionsSheet(
         }
     }
 
-    if (showLimitDialog) {
-        AlertDialog(
-            onDismissRequest = { showLimitDialog = false },
-            containerColor = SheetCol,
-            title = { Text("DAILY APP LIMIT", color = Ink, fontSize = 13.sp, letterSpacing = 2.sp) },
-            text = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(0 to "OFF", 15 to "15m", 30 to "30m", 60 to "60m").forEach { (m, lbl) ->
-                        Text(
-                            lbl,
-                            color = if (limitMins == m) InvInk else Dim,
-                            fontSize = 12.sp,
-                            modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(if (limitMins == m) Ink else Card)
-                                .clickable {
-                                    limitMins = m
-                                    prefs.edit().putInt("limit_${app.pkg}", m).apply()
-                                    showLimitDialog = false
-                                }
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        )
-                    }
-                }
-            },
-            confirmButton = { TextButton({ showLimitDialog = false }) { Text("DONE", color = Ink) } }
-        )
-    }
 }
 
 
